@@ -2,7 +2,6 @@
 # import rospy
 # from geometry_msgs.msg import Twist
 # from sensor_msgs.msg import LaserScan
-from time import time
 
 # def laser_scan_callback(data):
 # 	print data.ranges
@@ -27,7 +26,7 @@ def stop():
 	# mc.linear.x = 0
 	# mc.angular.z = 0
 	# pub.publish(mc)
-	print("Stopping")
+	print("Stopped")
 
 def turn(speed=0.75):
 	# pub = rospy.Publisher('cmd_trn', Twist, queue_size = 10)
