@@ -3,12 +3,6 @@
 # from geometry_msgs.msg import Twist
 # from sensor_msgs.msg import LaserScan
 from time import time
-import pygame, sys, scipy
-
-pygame.init()
-
-screen = pygame.display.set_mode((100,2))
-pygame.display.set_caption("My First Game")
 
 # def laser_scan_callback(data):
 # 	print data.ranges
@@ -45,38 +39,3 @@ def turn(speed=0.75):
 		print("Turning right")
 	else:
 		print("Turning left")
-
-
-if __name__ == '__main__':
-	clock = pygame.time.Clock()
-	carryOn = True
-
-	while carryOn:
-
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				carryOn = False
-			elif event.type==pygame.KEYDOWN:
-				if event.key==pygame.K_q:
-					carryOn=False
-
-		keys = pygame.key.get_pressed()
-		if keys[pygame.K_LEFT]:
-			turn(-0.75)
-		if keys[pygame.K_RIGHT]:
-			turn()
-		if keys[pygame.K_UP]:
-			move()
-		if keys[pygame.K_DOWN]:
-			move(-1)
-		if not(scipy.any(keys)):
-			stop()
-
-		pygame.display.flip()
-		clock.tick(60)
-
-	pygame.quit()
-	sys.exit()
-
-else:
-	stop()
