@@ -3,7 +3,7 @@
 # from geometry_msgs.msg import Twist
 # from sensor_msgs.msg import LaserScan
 from time import time
-import pygame, sys
+import pygame, sys, scipy
 
 pygame.init()
 
@@ -33,7 +33,7 @@ def stop():
 	# mc.linear.x = 0
 	# mc.angular.z = 0
 	# pub.publish(mc)
-	return 1
+	print("Stopping")
 
 def turn(speed=0.75):
 	# pub = rospy.Publisher('cmd_trn', Twist, queue_size = 10)
@@ -69,6 +69,8 @@ if __name__ == '__main__':
 			move()
 		if keys[pygame.K_DOWN]:
 			move(-1)
+		if not(scipy.any(keys)):
+			stop()
 
 		pygame.display.flip()
 		clock.tick(60)
