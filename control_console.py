@@ -26,9 +26,9 @@ def check_valid_duration(duration):
 	if duration <= 0:
 		return False
 	elif duration > 5:
-		answer = input("Warning are you sure you would like to run for " + str(duration) + " seconds? (yes/no):")
+		answer = raw_input("Warning are you sure you would like to run for " + str(duration) + " seconds? (yes/no):")
 		while answer != "yes" and answer != "no":
-			answer = input("Please enter yes or no:")
+			answer = raw_input("Please enter yes or no:")
 		
 		if answer == "yes":
 			return True
