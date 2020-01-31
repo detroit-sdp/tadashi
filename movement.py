@@ -21,7 +21,7 @@ def move(speed=1):
 	# 	print("Moving backwards")
 
 def turn(speed=0.75):
-	pub = rospy.Publisher('cmd_trn', Twist, queue_size = 10)
+	pub = rospy.Publisher('cmd_vel', Twist, queue_size = 10)
 	mc = Twist()
 	mc.linear.x = 0
 	mc.angular.z = speed
@@ -32,7 +32,7 @@ def turn(speed=0.75):
 	# 	print("Turning left")
 
 def stop():
-	pub = rospy.Publisher('cmd_stop', Twist, queue_size = 10)
+	pub = rospy.Publisher('cmd_vel', Twist, queue_size = 10)
 	mc = Twist()
 	mc.linear.x = 0
 	mc.angular.z = 0
