@@ -1,4 +1,5 @@
-import movement
+#!/usr/bin/env python
+import movement, rospy
 from time import time
 
 def check_valid_direction(d):
@@ -14,7 +15,7 @@ def check_valid_direction(d):
 		return 0
 
 def check_valid_speed(speed):
-	if speed <= 0:
+	if speed < 0:
 		return False
 	elif speed > 2:
 		return False
@@ -37,21 +38,23 @@ def check_valid_duration(duration):
 
 
 if __name__ == "__main__":
+	rospy.init_node('example_script',anonymous=True)
+
 	while True:
-		direction = input("Enter a direction (forward/back/right/left):")
+		direction = raw_input("Enter a direction (forward/back/right/left):")
 
 		while check_valid_direction(direction) == 0:
-			direction = input("Please enter a valid direction (forward/back/right/left):")
+			direction = raw_input("Please enter a valid direction (forward/back/right/left):")
 
-		speed = float(input("Enter a speed (less than 2):"))
+		speed = float(raw_input("Enter a speed (less than 2):"))
 
 		while not(check_valid_speed(speed)):
-			speed = float(input("Please enter a valid speed (0<speed<=2):"))
+			speed = float(raw_input("Please enter a valid speed (0<speed<=2):"))
 
-		duration = float(input("Enter a duration (be mindful of surroundings):"))
+		duration = float(raw_input("Enter a duration (be mindful of surroundings):"))
 
 		while not(check_valid_duration(duration)):
-			duration = float(input("Please enter a valid duration (>0):"))
+			duration = float(raw_input("Please enter a valid duration (>0):"))
 
 		direction = check_valid_direction(direction)
 		start_time = time()
@@ -59,26 +62,29 @@ if __name__ == "__main__":
 		if (direction == 1):
 			while time() < start_time + duration:
 				movement.move(speed)
-				movemnet.scan()
+				# movement.scan()
 		elif (direction == 2):
 			while time() < start_time + duration:
 				movement.move(-1*speed)
-				movemnet.scan()
+				# movement.scan()
 		elif (direction == 3):
 			while time() < start_time + duration:
 				movement.turn(speed)
-				movemnet.scan()
+				# movement.scan()
 		elif (direction == 4):
 			while time() < start_time + duration:
 				movement.turn(-1*speed)
-				movemnet.scan()
+				# movement.scan()
 
 
 		movement.stop()
 
-		answer = input("Continue?")
+		answer = raw_input("Continue?")
 
-		if answer == "no" or answer == "No" or answer == "nO" or answer == "NO" or answer == "n" or answer == "N":
+		while answer != "yes" and answer != "no":
+			answer = raw_input("Please enter yes/no:")
+
+		if answer == "no":
 			break
 else:
 	movement.stop()
