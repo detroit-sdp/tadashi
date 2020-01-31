@@ -1,4 +1,5 @@
-import movement, pygame, sys, scipy
+#!/usr/bin/env python
+import movement, pygame, sys, rospy
 
 pygame.init()
 
@@ -6,6 +7,7 @@ screen = pygame.display.set_mode((100,2))
 pygame.display.set_caption("Robot control test")
 
 if __name__ == '__main__':
+	rospy.init_node('example_script',anonymous=True)
 	clock = pygame.time.Clock()
 	carryOn = True
 
@@ -20,14 +22,14 @@ if __name__ == '__main__':
 
 		keys = pygame.key.get_pressed()
 		if keys[pygame.K_LEFT]:
-			movement.turn(-0.75)
-		if keys[pygame.K_RIGHT]:
 			movement.turn()
-		if keys[pygame.K_UP]:
+		elif keys[pygame.K_RIGHT]:
+			movement.turn(-0.75)
+		elif keys[pygame.K_UP]:
 			movement.move()
-		if keys[pygame.K_DOWN]:
+		elif keys[pygame.K_DOWN]:
 			movement.move(-1)
-		if not(scipy.any(keys)):
+		else:
 			movement.stop()
 
 		pygame.display.flip()
