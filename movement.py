@@ -4,7 +4,12 @@ from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 
 def laser_scan_callback(data):
-	print data.ranges
+	if data.ranges[0] < 0.5 and data.ranges[0] > 0.1:
+		print "Move out the way"
+	else:
+		print "Free to move"
+
+	print(data.ranges[0])
 
 def read_laser_scan_data():
 	rospy.Subscriber('scan', LaserScan, laser_scan_callback)
