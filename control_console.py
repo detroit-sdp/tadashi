@@ -62,19 +62,19 @@ if __name__ == "__main__":
 		if (direction == 1):
 			while time() < start_time + duration:
 				movement.move(speed)
-				# movement.scan()
+				movement.read_laser_scan_data()
 		elif (direction == 2):
 			while time() < start_time + duration:
 				movement.move(-1*speed)
-				# movement.scan()
+				movement.read_laser_scan_data()
 		elif (direction == 3):
 			while time() < start_time + duration:
-				movement.turn(speed)
-				# movement.scan()
+				movement.turn(-1*speed)
+				movement.read_laser_scan_data()
 		elif (direction == 4):
 			while time() < start_time + duration:
-				movement.turn(-1*speed)
-				# movement.scan()
+				movement.turn(speed)
+				movement.read_laser_scan_data()
 
 
 		movement.stop()
