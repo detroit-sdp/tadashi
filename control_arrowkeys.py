@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import movement, pygame, sys, rospy
+import movement, pygame, sys
+from rospy import init_node
 
 pygame.init()
 
@@ -7,7 +8,7 @@ screen = pygame.display.set_mode((100,2))
 pygame.display.set_caption("Robot control test")
 
 if __name__ == '__main__':
-	rospy.init_node('example_script',anonymous=True)
+	init_node('example_script',anonymous=True)
 	clock = pygame.time.Clock()
 	carryOn = True
 
@@ -20,20 +21,36 @@ if __name__ == '__main__':
 				if event.key==pygame.K_q:
 					carryOn=False
 
+
 		keys = pygame.key.get_pressed()
 		if keys[pygame.K_LEFT]:
-			movement.turn()
+			try:
+				movement.read_laser_scan_data()
+				movement.turn()
+			except rospy.ROSInterruptException:
+				pass
 		elif keys[pygame.K_RIGHT]:
-			movement.turn(-0.75)
+			try:
+				movement.read_laser_scan_data()
+				movement.turn(-0.75)
+			except rospy.ROSInterruptException:
+				pass
 		elif keys[pygame.K_UP]:
-			movement.move()
+			try:
+				movement.read_laser_scan_data()
+				movement.move()
+			except rospy.ROSInterruptException:
+				pass
 		elif keys[pygame.K_DOWN]:
-			movement.move(-1)
+			try:
+				movement.read_laser_scan_data()
+				movement.move(-1)
+			except rospy.ROSInterruptException:
+				pass
 		else:
 			movement.stop()
 
-		pygame.display.flip()
-		clock.tick(60)
+		clock.tick(25)
 
 	pygame.quit()
 	sys.exit()
