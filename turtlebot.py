@@ -35,4 +35,45 @@ class Turtlebot:
 
 
 if __name__ == '__main__':
+	pygame.init()
+	screen = pygame.display.set_mode((30,30))
+	pygame.display.set_caption("Turtlebot Controller")
+	clock = pygame.time.Clock()
+	carryOn = True
 
+	tb = Turtlebot()
+
+	while carryOn:
+		move = Twist()
+
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				carryOn = False
+			elif event.type==pygame.KEYDOWN:
+				if event.key==pygame.K_q:
+					carryOn=False
+
+
+		keys = pygame.key.get_pressed()
+		if keys[pygame.K_LEFT]:
+			move.linear.x = 0
+			move.angular.z = 0.75
+		elif keys[pygame.K_RIGHT]:
+			move.linear.x = 0
+			move.angular.z = 0.75
+		elif keys[pygame.K_UP]:
+			move.linear.x = 1
+			move.angular.z = 0
+		elif keys[pygame.K_DOWN]:
+			move.linear.x = -1
+			move.angular.z = 0
+		else:
+			move.linear.x = 0
+			move.angular.z = 0
+
+		tb.movement(move)
+
+		clock.tick(30)
+
+	pygame.quit()
+	sys.exit()
