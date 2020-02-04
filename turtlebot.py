@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-import rospy, pygame
+import rospy, pygame, sys
 from geometry_msgs.msg import Twist, Pose
 from sensor_msgs.msg import LaserScan
 from time import time
-from math import round
 
 class Turtlebot:
 	def __init__(self):
@@ -21,16 +20,16 @@ class Turtlebot:
 		# Pose of Turtlebot
 		self.pose = Pose()
 
-		def pose_callback(self, data):
-			self.pose = data
-			self.pose.x = round(self.pose.x, 4)
-			self.pose.y = round(self.pose.y, 4)
+	def pose_callback(self, data):
+		self.pose = data
+		self.pose.x = round(self.pose.x, 4)
+		self.pose.y = round(self.pose.y, 4)
 
-		def scan_callback(self, data):
-			print(data.ranges[0:5])
+	def scan_callback(self, data):
+		print(data.ranges[0:5])
 
-		def movement(self, controller):
-			self.movement_publisher.publish(controller)
+	def movement(self, controller):
+		self.movement_publisher.publish(controller)
 
 
 
@@ -49,9 +48,6 @@ if __name__ == '__main__':
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				carryOn = False
-			elif event.type==pygame.KEYDOWN:
-				if event.key==pygame.K_q:
-					carryOn=False
 
 
 		keys = pygame.key.get_pressed()
@@ -60,12 +56,16 @@ if __name__ == '__main__':
 			move.angular.z = 0.75
 		elif keys[pygame.K_RIGHT]:
 			move.linear.x = 0
-			move.angular.z = 0.75
+			move.angular.z = -0.75
 		elif keys[pygame.K_UP]:
 			move.linear.x = 1
 			move.angular.z = 0
 		elif keys[pygame.K_DOWN]:
 			move.linear.x = -1
+			move.angular.z = 0
+		elif keys[pygame.K_q]:
+			carryOn = False
+			move.linear.x = 0
 			move.angular.z = 0
 		else:
 			move.linear.x = 0
