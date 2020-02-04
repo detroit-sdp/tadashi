@@ -27,13 +27,32 @@ class Turtlebot:
 		# Rate (refreshes per second in Hz)
 		self.rate = rospy.Rate(10)
 
+		# banMove if something in front of bot
+		self.banMove = False
+
+
 	def pose_callback(self, data):
+		"""Callback function for pose_subscriber. This updates the pose
+		of the Turtlebot using the data from Odometry(). Prints current
+		pose as well for debugging."""
+
 		self.pose.pose = data.pose.pose
-		print self.pose.pose
+		# print self.pose.pose
 
 	def scan_callback(self, data):
+		"""Callback function for the scan_subscriber. This updates the
+		current readings from the LaserScan (indexed from 0 to 360). Prints
+		front 5 readings for debugging as well."""
+
 		self.readings.ranges = data.ranges
-		print self.readings.ranges[0:5]
+		
+		if self.readings.ranges[0] < 0.5 and self.readings.ranges[0] > 0.1:
+			self.banMove = True
+		else:
+			self.banMove = False
+
+
+		print self.readings.ranges[0]
 
 	def movement(self, controller):
 		self.movement_publisher.publish(controller)
@@ -56,9 +75,12 @@ if __name__ == '__main__':
 			if event.type == pygame.QUIT:
 				carryOn = False
 
-
 		keys = pygame.key.get_pressed()
-		if keys[pygame.K_LEFT]:
+
+		if tb.banMove:
+			move.linear.x = 0
+			move.angular.z = 0
+		elif keys[pygame.K_LEFT]:
 			move.linear.x = 0
 			move.angular.z = 0.75
 		elif keys[pygame.K_RIGHT]:
