@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+import rospy, pygame, sys
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import LaserScan
+from nav_msgs.msg import Odometry
+from time import time
+
+class Controller:
+	def __init__(self):
+		rospy.init_node('arrowkey_controller', anonymous=True)
+
+		# Publisher to publish movement and turning
+		self.movement_publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 10)
+		# Rate (refreshes per second in Hz)
+		self.rate = rospy.Rate(150)
+
+	def movement(self, controller):
+		self.movement_publisher.publish(controller)
+
+
+
+if __name__ == '__main__':
+	pygame.init()
+	screen = pygame.display.set_mode((20,20))
+	pygame.display.set_caption("Turtlebot Controller")
+	clock = pygame.time.Clock()
+	carryOn = True
+
+	tb = Controller()
+
+	while carryOn:
+		move = Twist()
+		pressed = False
+
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				carryOn = False
+
+		keys = pygame.key.get_pressed()
+
+		if keys[pygame.K_LEFT]:
+			move.angular.z = 0.75
+			pressed = True
+		if keys[pygame.K_RIGHT]:
+			move.angular.z = -0.75
+			pressed = True
+		if keys[pygame.K_UP]:
+			move.linear.x = .5
+			pressed = True
+		if keys[pygame.K_DOWN]:
+			move.linear.x = -.5
+			pressed = True
+		if keys[pygame.K_q]:
+			carryOn = False
+			move.linear.x = 0
+			move.angular.z = 0
+		if pressed == False:
+			move.linear.x = 0
+			move.angular.z = 0
+
+		tb.movement(move)
+		tb.rate.sleep()
+
+		clock.tick(30)
+
+	pygame.quit()
+	sys.exit()
