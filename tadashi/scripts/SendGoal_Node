@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+import rospy
+import actionlib
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+
+class Client:
+    def __init__(self):
+        self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+        self.client.wait_for_server()
+
+    def sendGoal(self, goal):
+        self.client.send_goal(goal)
+        self.client.wait_for_result()
+        return self.client.get_result()
+
+
+if __name__ == '__main__':
+    try:
+        rospy.init_node('send_goal')
+        sndr = Client()
+
+        goal = MoveBaseGoal()
+        goal.target_pose.header.frame_id = "base_link"
+        goal.target_pose.header.stamp = rospy.Time.now()
+        goal.target_pose.pose.position.x = -10.0
+        goal.target_pose.pose.orientation.w = 1.0
+
+        result = sndr.sendGoal(goal)
+        rospy.loginfo('Result: ' + result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo('Program interrupted before completion')
