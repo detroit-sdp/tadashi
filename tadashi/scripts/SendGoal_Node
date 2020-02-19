@@ -12,7 +12,7 @@ class Client:
     def sendGoal(self, goal):
         self.client.send_goal(goal)
         self.client.wait_for_result()
-        return self.client.get_result()
+        return self.client.get_state()
 
 
 if __name__ == '__main__':
@@ -20,13 +20,14 @@ if __name__ == '__main__':
         rospy.init_node('send_goal')
         sndr = Client()
 
-        goal = MoveBaseGoal()
-        goal.target_pose.header.frame_id = "base_link"
-        goal.target_pose.header.stamp = rospy.Time.now()
-        goal.target_pose.pose.position.x = -10.0
-        goal.target_pose.pose.orientation.w = 1.0
+        target = MoveBaseGoal()
+        target.target_pose.header.frame_id = "base_link"
+        target.target_pose.header.stamp = rospy.Time.now()
+        target.target_pose.pose.position.x = 1.0
+        target.target_pose.pose.position.y = 0.0
+        target.target_pose.pose.orientation.w = 1.0
 
-        result = sndr.sendGoal(goal)
-        rospy.loginfo('Result: ' + result)
+        result = sndr.sendGoal(target)
+        rospy.loginfo('Result: ' + str(result))
     except rospy.ROSInterruptException:
         rospy.loginfo('Program interrupted before completion')
