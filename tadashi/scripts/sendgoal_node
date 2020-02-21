@@ -3,6 +3,8 @@
 import rospy
 import actionlib
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Pose
 
 class Client:
     def __init__(self):
@@ -12,7 +14,24 @@ class Client:
     def sendGoal(self, goal):
         self.client.send_goal(goal)
         self.client.wait_for_result()
-        return self.client.get_state()
+
+        if client.get_result():
+            returngoal = self.invert(goal)
+
+            self.client.send_goal(goal)
+            self.client.wait_for_result()
+        else:
+            rospy.logerr('Goal not reached')
+
+    def invert(self, goal):
+        inverted = MoveBaseGoal()
+        inverted.target_pose.header.frame_id = "base_link"
+        inverted.target_pose.header.stamp = rospy.Time.now()
+        inverted.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.x)
+        inverted.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.y)
+        inverted.target_pose.pose.orientation.w = goal.target_pose.pose.orientation.w
+
+        return inverted
 
 
 if __name__ == '__main__':
@@ -21,13 +40,13 @@ if __name__ == '__main__':
         sndr = Client()
 
         target = MoveBaseGoal()
-        target.target_pose.header.frame_id = 'base_link'
+        target.target_pose.header.frame_id = "base_link"
         target.target_pose.header.stamp = rospy.Time.now()
-        target.target_pose.pose.position.x = 1.0
-        target.target_pose.pose.position.y = 0.0
+        target.target_pose.pose.position.x = 3.0
+        target.target_pose.pose.position.y = 3.0
         target.target_pose.pose.orientation.w = 1.0
 
-        result = sndr.sendGoal(target)
-        rospy.loginfo('Result: ' + str(result))
+        sndr.sendGoal(target)
+        rospy.loginfo('Done')
     except rospy.ROSInterruptException:
-        rospy.loginfo('Program interrupted before completion')
+        rospy.logerr('Program interrupted before completion')
