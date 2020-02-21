@@ -6,7 +6,7 @@ import socket
 import tadashi_helpers as th
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Pose, PoseWithCovarianceStamped
+from geometry_msgs.msg import Pose, PoseWithCovarianceStamped, Twist
 
 class Client:
     def __init__(self):
@@ -91,4 +91,13 @@ if __name__ == '__main__':
         sndr = Client()
         sndr.receiveGoal()
     except rospy.ROSInterruptException:
+        stop = Twist()
+        stop.linear.x = 0
+        stop.linear.y = 0
+        stop.linear.z = 0
+        stop.angular.x = 0
+        stop.angular.y = 0
+        stop.angular.z = 0
+        pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
+        pub.publish(stop)
         rospy.logerr('Program interrupted before completion')
