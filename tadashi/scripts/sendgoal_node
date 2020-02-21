@@ -19,7 +19,6 @@ class Client:
 
         if self.client.get_result():
             returngoal = self.invert(goal)
-
             self.client.send_goal(goal)
             self.client.wait_for_result()
         else:
@@ -56,6 +55,9 @@ class Client:
             commands = th.splitstringbychar(bytesAddressPair[0], ' ')
             address = bytesAddressPair[1]
 
+            print('Message from Client:{}'.format(bytesAddressPair[0]))
+            print('Client IP Address:{}'.format(address))
+
             command = commands[0]
             args = commands[1:]
 
@@ -64,19 +66,18 @@ class Client:
             target.target_pose.header.stamp = rospy.Time.now()
 
             if int(args[0]) == 1:
+                rospy.loginfo('Going to room 1')
                 target.target_pose.pose.position.x = 3.0
                 target.target_pose.pose.position.y = -1.0
                 target.target_pose.pose.orientation.w = 1.0
             elif int(args[0]) == 2:
+                rospy.loginfo('Going to room 1')
                 target.target_pose.pose.position.x = -4.0
                 target.target_pose.pose.position.y = -5.0
                 target.target_pose.pose.orientation.w = 1.0
         
             self.sendGoal(target)
             rospy.loginfo('Goal met and returned to base')
-
-            print('Message from Client:{}'.format(bytesAddressPair[0]))
-            print('Client IP Address:{}'.format(address))
 
             # address = (address[0], 20002)
             # UDPServerSocket.sendto(bytesToSend, address)
