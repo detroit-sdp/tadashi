@@ -3,7 +3,7 @@
 import rospy
 import actionlib
 import socket
-import tadashi_helpers as th
+import tadashi.scripts.tadashi_helpers as th
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose, PoseWithCovarianceStamped
