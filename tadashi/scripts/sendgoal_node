@@ -21,7 +21,7 @@ class Client:
         if self.client.get_result():
             rospy.loginfo('Goal met; returning to base')
             returngoal = self.invert(goal)
-            self.client.send_goal(goal)
+            self.client.send_goal(returngoal)
             self.client.wait_for_result()
         else:
             rospy.logerr('Goal not reached')
