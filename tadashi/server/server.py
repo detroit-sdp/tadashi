@@ -1,10 +1,8 @@
 import socket
 
-localIP = "10.0.2.15"
-localPort = 20001
-bufferSize = 1024
+msgFromServer = "test return"
 
-msgFromServer = "Hello UDP Client"
+bufferSize = 1024
 
 bytesToSend = str.encode(msgFromServer)
 
@@ -12,9 +10,7 @@ bytesToSend = str.encode(msgFromServer)
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
 # Bind to address and ip
-UDPServerSocket.bind((localIP, localPort))
-
-print("UDP server up and listening")
+UDPServerSocket.connect(('192.168.137.150', 20001))
 
 # Listen for incoming datagrams
 while(True):
@@ -22,7 +18,6 @@ while(True):
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
 
     message = bytesAddressPair[0]
-
     address = bytesAddressPair[1]
 
     clientMsg = "Message from Client:{}".format(message)
@@ -30,7 +25,6 @@ while(True):
     
     print(clientMsg)
     print(clientIP)
-    address = (address[0], 20002)
 
     # Sending a reply to client
-    UDPServerSocket.sendto(bytesToSend, address)
+    UDPServerSocket.send(bytesToSend)
