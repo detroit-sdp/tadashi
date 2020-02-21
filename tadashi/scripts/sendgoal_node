@@ -13,8 +13,6 @@ class Client:
         self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.client.wait_for_server()
 
-        self.initpose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped(), queue_size=1)
-
     def sendGoal(self, goal):
         self.client.send_goal(goal)
         self.client.wait_for_result()
