@@ -43,7 +43,7 @@ if __name__ == '__main__':
         target.target_pose.header.frame_id = "base_link"
         target.target_pose.header.stamp = rospy.Time.now()
         target.target_pose.pose.position.x = 3.0
-        target.target_pose.pose.position.y = 3.0
+        target.target_pose.pose.position.y = 1.0
         target.target_pose.pose.orientation.w = 1.0
 
         sndr.sendGoal(target)
