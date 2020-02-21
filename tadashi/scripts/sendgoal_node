@@ -28,7 +28,7 @@ class Client:
 
     def invert(self, goal):
         inverted = MoveBaseGoal()
-        inverted.target_pose.header.frame_id = "base_link"
+        inverted.target_pose.header.frame_id = 'base_link'
         inverted.target_pose.header.stamp = rospy.Time.now()
         inverted.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.x)
         inverted.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.y)
@@ -64,19 +64,21 @@ class Client:
             args = commands[1:]
 
             target = MoveBaseGoal()
-            target.target_pose.header.frame_id = "base_link"
+            target.target_pose.header.frame_id = 'base_link'
             target.target_pose.header.stamp = rospy.Time.now()
+            target.target_pose.pose.orientation.x = 0.0
+            target.target_pose.pose.orientation.y = 0.0
+            target.target_pose.pose.orientation.z = 0.0
+            target.target_pose.pose.orientation.w = 1.0
 
             if int(args[0]) == 1:
                 rospy.loginfo('Going to room 1')
                 target.target_pose.pose.position.x = 3.0
                 target.target_pose.pose.position.y = -1.0
-                target.target_pose.pose.orientation.w = 1.0
             elif int(args[0]) == 2:
                 rospy.loginfo('Going to room 2')
                 target.target_pose.pose.position.x = -4.0
                 target.target_pose.pose.position.y = -4.0
-                target.target_pose.pose.orientation.w = 1.0
         
             self.sendGoal(target)
             rospy.loginfo('Goal met and returned to base')
