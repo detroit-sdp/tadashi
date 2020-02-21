@@ -6,7 +6,8 @@ import socket
 import tadashi_helpers as th
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Pose, PoseWithCovarianceStamped, Twist, Point, Quaternion
+from geometry_msgs.msg import Pose, PoseWithCovarianceStamped, Twist
+
 class Client:
     def __init__(self):
         rospy.init_node('send_goal', anonymous=True)
@@ -19,23 +20,19 @@ class Client:
 
         if self.client.get_result():
             rospy.loginfo('Goal met; returning to base')
-            returngoal = self.returngoal(goal)
-            
+            returngoal = self.invert(goal)
             self.client.send_goal(returngoal)
             self.client.wait_for_result()
         else:
             rospy.logerr('Goal not reached')
 
-    def returngoal(self, goal):
+    def invert(self, goal):
         inverted = MoveBaseGoal()
         inverted.target_pose.header.frame_id = "base_link"
         inverted.target_pose.header.stamp = rospy.Time.now()
-
-        quat = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
-        pos = {'x': -2, 'y' : 4.0}
-        
-        inverted.target_pose.pose = Pose(Point(pos['x'], pos['y'], 0.000),
-                                        Quaternion(quat['r1'], quat['r2'], quat['r3'], quat['r4']))
+        inverted.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.x)
+        inverted.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.y)
+        inverted.target_pose.pose.orientation.w = goal.target_pose.pose.orientation.w
 
         return inverted
 
@@ -70,18 +67,16 @@ class Client:
             target.target_pose.header.frame_id = "base_link"
             target.target_pose.header.stamp = rospy.Time.now()
 
-            quat = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
-
             if int(args[0]) == 1:
                 rospy.loginfo('Going to room 1')
-                pos = {'x': 3, 'y' : -1}
-                target.target_pose.pose = Pose(Point(pos['x'], pos['y'], 0.000),
-                                     Quaternion(quat['r1'], quat['r2'], quat['r3'], quat['r4']))
+                target.target_pose.pose.position.x = 3.0
+                target.target_pose.pose.position.y = -1.0
+                target.target_pose.pose.orientation.w = 1.0
             elif int(args[0]) == 2:
                 rospy.loginfo('Going to room 2')
-                pos = {'x': -4, 'y' : -4}
-                target.target_pose.pose = Pose(Point(pos['x'], pos['y'], 0.000),
-                                     Quaternion(quat['r1'], quat['r2'], quat['r3'], quat['r4']))
+                target.target_pose.pose.position.x = -4.0
+                target.target_pose.pose.position.y = -4.0
+                target.target_pose.pose.orientation.w = 1.0
         
             self.sendGoal(target)
             rospy.loginfo('Goal met and returned to base')
