@@ -73,7 +73,7 @@ class Client:
                 target.target_pose.pose.position.y = -1.0
                 target.target_pose.pose.orientation.w = 1.0
             elif int(args[0]) == 2:
-                rospy.loginfo('Going to room 1')
+                rospy.loginfo('Going to room 2')
                 target.target_pose.pose.position.x = -4.0
                 target.target_pose.pose.position.y = -5.0
                 target.target_pose.pose.orientation.w = 1.0
