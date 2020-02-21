@@ -21,7 +21,7 @@ if __name__ == '__main__':
         sndr = Client()
 
         target = MoveBaseGoal()
-        target.target_pose.header.frame_id = "base_link"
+        target.target_pose.header.frame_id = 'base_link'
         target.target_pose.header.stamp = rospy.Time.now()
         target.target_pose.pose.position.x = 1.0
         target.target_pose.pose.position.y = 0.0
