@@ -39,23 +39,22 @@ def receivegoal():
         target.target_pose.header.stamp = rospy.Time.now()
 
         if int(args[0]) == 1:
-            target.target_pose.pose.position.x = -3.0
-            target.target_pose.pose.position.y = 1.0
+            target.target_pose.pose.position.x = 3.0
+            target.target_pose.pose.position.y = -1.0
             target.target_pose.pose.orientation.w = 1.0
         elif int(args[0]) == 2:
-            target.target_pose.pose.position.x = -3.0
-            target.target_pose.pose.position.y = 1.0
+            target.target_pose.pose.position.x = -4.0
+            target.target_pose.pose.position.y = -5.0
             target.target_pose.pose.orientation.w = 1.0
         
         actionclient.sendGoal(target)
+        rospy.loginfo('Goal met and returned to base')
 
         print('Message from Client:{}'.format(bytesAddressPair[0]))
         print('Client IP Address:{}'.format(address))
 
         # address = (address[0], 20002)
         # UDPServerSocket.sendto(bytesToSend, address)
-
-        # GOTO 1 or GOTO 2
 
     rospy.spin()
 
