@@ -3,7 +3,7 @@
 import rospy
 import actionlib
 import socket
-import tadashi.scripts.tadashi_helpers as th
+import tadashi_helpers as th
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose, PoseWithCovarianceStamped
@@ -13,7 +13,7 @@ class Client:
         self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.client.wait_for_server()
 
-        self.initpose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped(), queuesize=1)
+        self.initpose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped(), queue_size=1)
 
     def sendGoal(self, goal):
         self.client.send_goal(goal)
