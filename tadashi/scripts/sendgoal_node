@@ -18,6 +18,7 @@ class Client:
         self.client.wait_for_result()
 
         if self.client.get_result():
+            rospy.loginfo('Goal met; returning to base')
             returngoal = self.invert(goal)
             self.client.send_goal(goal)
             self.client.wait_for_result()
