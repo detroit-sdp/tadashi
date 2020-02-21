@@ -87,6 +87,6 @@ if __name__ == '__main__':
     try:
         rospy.init_node('send_goal', anonymous=True)
         sndr = Client()
-        sndr.receivegoal()
+        sndr.receiveGoal()
     except rospy.ROSInterruptException:
         rospy.logerr('Program interrupted before completion')
