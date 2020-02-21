@@ -10,6 +10,7 @@ from geometry_msgs.msg import Pose, PoseWithCovarianceStamped
 
 class Client:
     def __init__(self):
+        rospy.init_node('send_goal', anonymous=True)
         self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.client.wait_for_server()
 
@@ -87,7 +88,6 @@ class Client:
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('send_goal', anonymous=True)
         sndr = Client()
         sndr.receiveGoal()
     except rospy.ROSInterruptException:
