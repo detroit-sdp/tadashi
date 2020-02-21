@@ -4,12 +4,14 @@ import rospy
 import actionlib
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Pose, PoseWithCovarianceStamped
 
 class Client:
     def __init__(self):
         self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.client.wait_for_server()
+
+        self.initpose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped(), queuesize=1)
 
     def sendGoal(self, goal):
         self.client.send_goal(goal)
