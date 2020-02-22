@@ -6,7 +6,7 @@ localIP = 'localhost'   # I don't think you change this, but if it fails then se
 localPort = 20001
 bufferSize = 1024
 
-# msgFromServer = "1"
+# msgFromServer = 'test return'
 # bytesToSend = str.encode(msgFromServer)
 
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
