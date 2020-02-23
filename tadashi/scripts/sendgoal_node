@@ -14,6 +14,13 @@ class Client:
         self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.client.wait_for_server()
 
+        # init_pose = rospy.Publisher('/initialpose', PoseWithCovarianceStamped, queue_size=1)
+        # initialPose = PoseWithCovarianceStamped()
+        # initialPose.pose.pose.position.x = 0.0
+        # initialPose.pose.pose.position.y = 0.0
+        # intialPose.pose.orientation.w = 1.0
+        # init_pose.publish(initialPose)
+
     def sendGoal(self, goal):
         self.client.send_goal(goal)
         self.client.wait_for_result()
@@ -37,7 +44,7 @@ class Client:
         return inverted
 
     def receiveGoal(self):
-        localIP = 'localhost'   # I don't think you set this, but if failure set to '' or '127.0.0.1' 
+        localIP = ''   # I don't think you set this, but if failure set to 'localhost' or '127.0.0.1' 
                                 # or '192.168.105.x' as shown in ifconfig
 
         localPort = 20001
@@ -83,7 +90,7 @@ class Client:
             self.sendGoal(target)
             rospy.loginfo('Goal met and returned to base')
 
-            # address = (address[0], 20002)
+            # # address = (address[0], 20002)
             # UDPServerSocket.sendto(bytesToSend, address)
         rospy.spin()
 
