@@ -55,6 +55,7 @@ class Client:
 
         UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
         UDPServerSocket.bind((localIP, localPort))
+        UDPServerSocket.settimeout(None)
 
         print('UDP server up and listening')
 
