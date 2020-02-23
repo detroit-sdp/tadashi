@@ -39,16 +39,16 @@ if __name__ == '__main__':
 		keys = pygame.key.get_pressed()
 
 		if keys[pygame.K_LEFT]:
-			move.angular.z = 0.75
+			move.angular.z = 0.5
 			pressed = True
 		if keys[pygame.K_RIGHT]:
-			move.angular.z = -0.75
+			move.angular.z = -0.5
 			pressed = True
 		if keys[pygame.K_UP]:
-			move.linear.x = 1.0
+			move.linear.x = 0.15
 			pressed = True
 		if keys[pygame.K_DOWN]:
-			move.linear.x = -1.0
+			move.linear.x = -0.15
 			pressed = True
 		if keys[pygame.K_q]:
 			carryOn = False
