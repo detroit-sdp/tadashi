@@ -14,7 +14,7 @@ class Client:
         self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.client.wait_for_server()
 
-        # init_pose = rospy.Publisher('/initialpose', PoseWithCovarianceStamped, queue_size=1)
+        # init_pose = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=1)
         # initialPose = PoseWithCovarianceStamped()
         # initialPose.pose.pose.position.x = 0.0
         # initialPose.pose.pose.position.y = 0.0
@@ -65,10 +65,15 @@ class Client:
             commands = helpers.splitstringbychar(bytesAddressPair[0], ' ')
             address = bytesAddressPair[1]
 
-            print('Message from Client:{}'.format(bytesAddressPair[0]))
-            print('Client IP Address:{}'.format(address))
+            rospy.loginfo('Message from Client:{}'.format(bytesAddressPair[0]))
+            rospy.loginfo('Client IP Address:{}'.format(address))
 
             command = commands[0]
+
+            if command.upper() != 'GOTO':
+                rospy.logerr('Command not recognised')
+                continue
+
             args = commands[1:]
 
             target = MoveBaseGoal()
