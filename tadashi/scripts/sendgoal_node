@@ -3,7 +3,7 @@
 import rospy
 import actionlib
 import socket
-import tadashi_helpers as th
+import tadashi_helpers as helpers
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose, PoseWithCovarianceStamped, Twist
@@ -61,7 +61,7 @@ class Client:
         while(True):
             bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
 
-            commands = th.splitstringbychar(bytesAddressPair[0], ' ')
+            commands = helpers.splitstringbychar(bytesAddressPair[0], ' ')
             address = bytesAddressPair[1]
 
             print('Message from Client:{}'.format(bytesAddressPair[0]))
