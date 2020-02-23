@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import socket
-localIP = 'localhost'   # I don't think you change this, but if it fails then set to '', '127.0.0.1',
+localIP = ''   # I don't think you change this, but if it fails then set to 'localhost', '127.0.0.1',
 						# or '192.168.105.x' as shown in ifconfig
 
 localPort = 20001
