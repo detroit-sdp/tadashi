@@ -3,6 +3,7 @@
 import rospy
 import actionlib
 import socket
+import time
 import tadashi_helpers as helpers
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
@@ -26,6 +27,7 @@ class Client:
         self.client.wait_for_result()
 
         if self.client.get_result():
+            rospy.sleep(60.0)
             rospy.loginfo('Goal met; returning to base')
             returngoal = self.invert(goal)
             self.client.send_goal(returngoal)
