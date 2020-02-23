@@ -14,5 +14,7 @@ def splitstringbychar(st, c):
         else:
             i+=1
         
-    
     return strs
+
+# st = 'The h ill L s are !!!! alive Wit h Da SuOoUnd of MUSicia..cc         '
+# print(splitstringbychar(st, ' '))
