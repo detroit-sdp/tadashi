@@ -46,8 +46,7 @@ class Client:
         return inverted
 
     def receiveGoal(self):
-        localIP = ''    # I don't think you set this, but if failure set to 'localhost' or '127.0.0.1' 
-                        # or '192.168.105.x' as shown in ifconfig
+        localIP = ''
 
         localPort = 20001
         bufferSize = 1024
@@ -81,31 +80,34 @@ class Client:
             target = MoveBaseGoal()
             target.target_pose.header.frame_id = 'base_link'
             target.target_pose.header.stamp = rospy.Time.now()
-            target.target_pose.pose.orientation.x = 0.0
-            target.target_pose.pose.orientation.y = 0.0
-            target.target_pose.pose.orientation.z = 0.0
-            target.target_pose.pose.orientation.w = 1.0
 
             if int(args[0]) == 1:
                 rospy.loginfo('Going to room 1')
-                target.target_pose.pose.position.x = 3.0
-                target.target_pose.pose.position.y = -1.0
+                target.target_pose.pose.position.x = 0
+                target.target_pose.pose.position.y = 0
+                target.target_pose.pose.orientation.w = 0.732
             elif int(args[0]) == 2:
                 rospy.loginfo('Going to room 2')
-                target.target_pose.pose.position.x = -4.0
-                target.target_pose.pose.position.y = -4.0
+                target.target_pose.pose.position.x = 0
+                target.target_pose.pose.position.y = 0
+                target.target_pose.pose.orientation.w = 0.969
+            elif int(args[0]) == 3:
+                rospy.loginfo('Going to room 3')
+                target.target_pose.pose.position.x = 0
+                target.target_pose.pose.position.y = 0
+                target.target_pose.pose.orientation.w = 1.0
         
             self.sendGoal(target)
             rospy.loginfo('Goal met and returned to base')
 
             # # address = (address[0], 20002)
             # UDPServerSocket.sendto(bytesToSend, address)
-        rospy.spin()
 
 
 if __name__ == '__main__':
     try:
         sndr = Client()
         sndr.receiveGoal()
+        rospy.spin()
     except rospy.ROSInterruptException:
         rospy.logerr('Program interrupted before completion')
