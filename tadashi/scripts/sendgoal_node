@@ -34,22 +34,28 @@ class Client:
             rospy.logerr('Goal not reached')
     
     def getbasereturn(self, goal, room):
+        returngoal = MoveBaseGoal()
+        returngoal.target_pose.header.frame_id = 'base_link'
+        returngoal.target_pose.header.stamp = rospy.Time.now()
+
+
         if room == 1:
-            goal.target_pose.pose.position.x = 0.0
-            goal.target_pose.pose.position.y = 0.0
-            goal.target_pose.pose.orientation.z = 0.0
-            goal.target_pose.pose.orientation.w = 1.0
+            returngoal.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.x)
+            returngoal.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.y)
+            returngoal.target_pose.pose.orientation.z = 0.0
+            returngoal.target_pose.pose.orientation.w = 1.0
         elif room == 2:
-            goal.target_pose.pose.position.x = 0.0
-            goal.target_pose.pose.position.y = 0.0
-            goal.target_pose.pose.orientation.z = 0.0
-            goal.target_pose.pose.orientation.w = 1.0
+            returngoal.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.x)
+            returngoal.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.y)
+            returngoal.target_pose.pose.orientation.z = 0.0
+            returngoal.target_pose.pose.orientation.w = 1.0
         elif room == 3:
-            goal.target_pose.pose.position.x = 0.0
-            goal.target_pose.pose.position.y = 0.0
-            goal.target_pose.pose.orientation.z = -0.7071
-            goal.target_pose.pose.orientation.w = 0.7071
-        return goal
+            returngoal.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.y)
+            returngoal.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.x)
+            returngoal.target_pose.pose.orientation.z = -0.7071
+            returngoal.target_pose.pose.orientation.w = 0.7071
+        
+        return returngoal
 
     def receiveGoal(self):
         localIP = ''
@@ -83,10 +89,8 @@ class Client:
                 continue
 
             target = MoveBaseGoal()
-            returngoal = MoveBaseGoal()
             target.target_pose.header.frame_id = 'base_link'
             target.target_pose.header.stamp = rospy.Time.now()
-            returngoal.target_pose.header.frame_id = 'base_link'
 
             if int(args[0]) == 1:
                 rospy.loginfo('Going to room 1')
@@ -94,21 +98,21 @@ class Client:
                 target.target_pose.pose.position.y = 0
                 target.target_pose.pose.orientation.z = 0
                 target.target_pose.pose.orientation.w = 1
-                returngoal = self.getbasereturn(returngoal, 1)
+                returngoal = self.getbasereturn(target, 1)
             elif int(args[0]) == 2:
                 rospy.loginfo('Going to room 2')
                 target.target_pose.pose.position.x = 0
                 target.target_pose.pose.position.y = 0
                 target.target_pose.pose.orientation.z = 0
                 target.target_pose.pose.orientation.w = 1
-                returngoal = self.getbasereturn(returngoal, 2)
+                returngoal = self.getbasereturn(target, 2)
             elif int(args[0]) == 3:
                 rospy.loginfo('Going to room 3')
                 target.target_pose.pose.position.x = 0
                 target.target_pose.pose.position.y = 0
                 target.target_pose.pose.orientation.z = 0.7071
                 target.target_pose.pose.orientation.w = 0.7071
-                returngoal = self.getbasereturn(returngoal, 3)
+                returngoal = self.getbasereturn(target, 3)
         
             self.sendGoal(target, returngoal)
             rospy.loginfo('Goal met and returned to base')
