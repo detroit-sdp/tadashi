@@ -80,12 +80,11 @@ class Client:
             rospy.loginfo('Client IP Address:{}'.format(address))
 
             command = commands[0]
+            args = commands[1:]
 
-            if command.upper() != 'GOTO':
+            if command.upper() != 'GOTO' or int(args[0]) > 3:
                 rospy.logerr('Command not recognised')
                 continue
-
-            args = commands[1:]
 
             target = MoveBaseGoal()
             target.target_pose.header.frame_id = 'base_link'
