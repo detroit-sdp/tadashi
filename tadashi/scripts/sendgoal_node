@@ -21,15 +21,18 @@ class Client:
         # initialPose.pose.pose.position.y = 0.0
         # intialPose.pose.orientation.w = 1.0
         # init_pose.publish(initialPose)
+        base = PoseWithCovarianceStamped()
+        base.pose.pose.position.x = 0.0
+        base.pose.pose.position.y = 0.0
 
     def sendGoal(self, goal):
         self.client.send_goal(goal)
         self.client.wait_for_result()
+        returngoal = self.base
 
         if self.client.get_result():
-            rospy.sleep(60.0)
-            rospy.loginfo('Goal met; returning to base')
-            returngoal = self.invert(goal)
+            rospy.loginfo('Goal met')
+            raw_input('Press [ENTER] to return to base')
             self.client.send_goal(returngoal)
             self.client.wait_for_result()
         else:
@@ -44,6 +47,13 @@ class Client:
         inverted.target_pose.pose.orientation.w = goal.target_pose.pose.orientation.w
 
         return inverted
+
+    def coord2distance(self, (x, y)):
+        # self.getpose
+        # returnx = -1 * (currentx - x)
+        # returny = -1 * (currenty - y)
+        # return (returnx, returny)
+        return None
 
     def receiveGoal(self):
         localIP = ''
