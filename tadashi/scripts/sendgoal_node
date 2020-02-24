@@ -48,11 +48,11 @@ class Client:
 
         return inverted
 
-    def coord2distance(self, (x, y)):
+    def coord2distance(self, (x, y, w)):
         # self.getpose
         # returnx = -1 * (currentx - x)
         # returny = -1 * (currenty - y)
-        # return (returnx, returny)
+        # return (returnx, returny, return w)
         return None
 
     def receiveGoal(self):
