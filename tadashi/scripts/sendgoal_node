@@ -4,7 +4,7 @@ import rospy
 import actionlib
 import socket
 import time
-import tadashi_helpers as helpers
+from tadashi_helpers import *
 from const import *
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
@@ -24,10 +24,10 @@ class Client:
 	def position_callback(self, msg):
 		self.position = msg.pose.pose.position
 		self.orientation = msg.pose.pose.orientation
-		print(self.position)
 
 
 	def send_goal(self, goal):
+		goal.target_pose.header.stamp = rospy.Time.now()
 		self.client.send_goal(goal)
 		self.client.wait_for_result()
 
@@ -37,7 +37,7 @@ class Client:
 			rospy.loginfo('Goal met')
 		else:
 			rospy.logerr('Goal not reached')
-		
+
 		rospy.loginfo('Press [ENTER] to return to base')
 		raw_input()
 		returngoal.target_pose.header.stamp = rospy.Time.now()
@@ -51,14 +51,13 @@ class Client:
 
 
 	def get_goal(self, room):
-		point = ROOMS[room][:2]
-		rotation = ROOMS[room][2]
+		point = ROOMS[room][0]
+		rotation = ROOMS[room][1]
 
 		target = MoveBaseGoal()
 		target.target_pose.header.frame_id = 'base_link'
-		target.target_pose.header.stamp = rospy.Time.now()
-		target.target_pose.pose.position.x, target.target_pose.pose.position.y = helpers.pointstovector((self.position.x,
-																					self.position.y), point)
+		target.target_pose.pose.position.x, target.target_pose.pose.position.y = pointstovector((self.position.x,
+																						self.position.y), point)
 
 		if rotation == 'F'
 			target.target_pose.pose.orientation.z = 0
@@ -72,10 +71,15 @@ class Client:
 		elif rotation == 'L':
 			target.target_pose.pose.orientation.z = -0.7071
 			target.target_pose.pose.orientation.w = 0.7071
+
 		return target
 	
 
 	def getbasereturn(self):
+
+		save = Quaternion()
+		save = self.orientation
+
 		turn = MoveBaseGoal()
 		turn.target_pose.header.frame_id = 'base_link'
 		turn.target_pose.header.stamp = rospy.Time.now()
@@ -88,8 +92,15 @@ class Client:
 
 		returngoal = MoveBaseGoal()
 		returngoal.target_pose.header.frame_id = 'base_link'
-		returngoal.target_pose.pose.position.x, returngoal.target_pose.pose.position.y = helpers.pointstovector((self.position.x,
-																		self.position.y), ROOMS['BASE'][:2])
+		returngoal.target_pose.pose.position.x, returngoal.target_pose.pose.position.y = pointstovector((self.position.x,
+																		self.position.y), ROOMS['BASE'][0])
+
+		turn.target_pose.header.stamp = rospy.Time.now()
+		turn.target_pose.pose.orientation.z = save.z
+		turn.target_pose.pose.orientation.w = save.w
+		self.client.send_goal(turn)
+		self.client.wait_for_result()
+
 		return returngoal
 
 
@@ -108,7 +119,7 @@ class Client:
 		while(True):
 			bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
 
-			commands = helpers.splitstringbychar(bytesAddressPair[0], ' ')
+			commands = splitstringbychar(bytesAddressPair[0], ' ')
 			address = bytesAddressPair[1]
 
 			rospy.loginfo('Message from Client:{}'.format(bytesAddressPair[0]))
@@ -121,10 +132,10 @@ class Client:
 				rospy.logerr('Command not recognised')
 				continue
 
-			target = get_goal(int(args[0]))
-			self.send_goal(target)
-
-			rospy.loginfo('Goal met and returned to base')
+			if command.upper() == 'GOTO':
+				target = get_goal(int(args[0]))
+				self.send_goal(target)
+				
 
 
 if __name__ == '__main__':
