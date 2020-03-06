@@ -22,6 +22,6 @@ def pointstovector((x1,y1),(x2,y2)):
 # st = 'The h ill L s are !!!! alive Wit h Da SuOoUnd of MUSicia..cc         '
 # print(splitstringbychar(st, ' '))
 
-# fr = (100,9)
+# fr = (100.97,9.34)
 # to = (10,7)
 # print(pointstovector(fr,to))
