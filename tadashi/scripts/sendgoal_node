@@ -49,7 +49,7 @@ class Client:
 		if self.client.get_result():
 			rospy.loginfo('Base successfully returned to')
 		else:
-			rospy.logerr('Base not reached. Human interaction required')
+			rospy.logerr('Base not reached: ASSISTANCE REQUIRED')
 
 
 	def get_goal(self, room):
@@ -127,7 +127,7 @@ class Client:
 			self.send_goal(target)
 
 			rospy.loginfo('Goal met and returned to base')
-			
+
 
 if __name__ == '__main__':
 	try:
