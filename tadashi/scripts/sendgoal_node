@@ -5,9 +5,10 @@ import actionlib
 import socket
 import time
 import tadashi_helpers as helpers
+from const import *
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PoseWithCovariance, Twist, Pose
+from geometry_msgs.msg import PoseWithCovariance, Twist, Pose, Point, Quaternion
 
 class Client:
 	def __init__(self):
@@ -15,7 +16,16 @@ class Client:
 		self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 		self.client.wait_for_server()
 
-	def sendGoal(self, goal, returngoal):
+		self.positiontracker = rospy.Subscriber('odom', Odometry, self.position_callback)
+		self.position = Point()
+		self.orientation = Quaternion()
+
+	def position_callback(self, msg):
+		self.position = msg.pose.pose.position
+		self.orientation = msg.pose.pose.orientation
+		print(self.position)
+
+	def send_goal(self, goal, returngoal):
 		self.client.send_goal(goal)
 		self.client.wait_for_result()
 
@@ -32,31 +42,50 @@ class Client:
 				rospy.logerr('Base not reached')
 		else:
 			rospy.logerr('Goal not reached')
+
+	def get_goal(self, room):
+		point = ROOMS[room]
+
+		target = MoveBaseGoal()
+		target.target_pose.header.frame_id = 'base_link'
+		target.target_pose.header.stamp = rospy.Time.now()
+		target.target_pose.pose.position.x, target.target_pose.pose.position.y = helpers.pointstovector((self.position.x,
+																					self.position.y), point)
+
+		if ROOMS[room] == 'F'
+			target.target_pose.pose.orientation.z = 0
+			target.target_pose.pose.orientation.w = 1
+		elif ROOMS[room] == 'R':
+			target.target_pose.pose.orientation.z = 0.7071
+			target.target_pose.pose.orientation.w = 0.7071
+		elif ROOMS[room] == 'B':
+			target.target_pose.pose.orientation.z = 1
+			target.target_pose.pose.orientation.w = 0
+		elif ROOMS[room] == 'L':
+			target.target_pose.pose.orientation.z = -0.7071
+			target.target_pose.pose.orientation.w = 0.7071
+
+		return target
 	
-	def getbasereturn(self, goal, room):
+	def getbasereturn(self):
+		turn = MoveBaseGoal()
+		turn.target_pose.header.frame_id = 'base_link'
+		turn.target_pose.header.stamp = rospy.Time.now()
+		turn.target_pose.pose.position.x = 0
+		turn.target_pose.pose.position.y = 0
+		turn.target_pose.pose.orientation.z = 0
+		turn.target_pose.pose.orientation.w = 1
+		self.client.send_goal(turn)
+		self.client.wait_for_result()
+
 		returngoal = MoveBaseGoal()
 		returngoal.target_pose.header.frame_id = 'base_link'
 		returngoal.target_pose.header.stamp = rospy.Time.now()
-
-		if room == 1:
-			returngoal.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.x)
-			returngoal.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.y)
-			returngoal.target_pose.pose.orientation.z = 0.0
-			returngoal.target_pose.pose.orientation.w = 1.0
-		elif room == 2:
-			returngoal.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.x)
-			returngoal.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.y)
-			returngoal.target_pose.pose.orientation.z = 0.0
-			returngoal.target_pose.pose.orientation.w = 1.0
-		elif room == 3:
-			returngoal.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.y)
-			returngoal.target_pose.pose.position.y = goal.target_pose.pose.position.x
-			returngoal.target_pose.pose.orientation.z = -0.7071
-			returngoal.target_pose.pose.orientation.w = 0.7071
-		
+		returngoal.target_pose.pose.position.x, returngoal.target_pose.pose.position.y = helpers.pointstovector((self.position.x,
+																		self.position.y), ROOMS['BASE'])
 		return returngoal
 
-	def receiveGoal(self):
+	def receive_goal(self):
 		localIP = ''
 
 		localPort = 20001
@@ -80,44 +109,20 @@ class Client:
 			command = commands[0]
 			args = commands[1:]
 
-			if command.upper() != 'GOTO' or int(args[0]) > 3:
+			if not (command.upper() in COMMANDS):
 				rospy.logerr('Command not recognised')
 				continue
 
-			target = MoveBaseGoal()
-			target.target_pose.header.frame_id = 'base_link'
-			target.target_pose.header.stamp = rospy.Time.now()
+			target = get_goal(int(args[0]))
+			self.send_goal(target)
 
-			if int(args[0]) == 1:
-				rospy.loginfo('Going to room 1')
-				target.target_pose.pose.position.x = 0
-				target.target_pose.pose.position.y = 0
-				target.target_pose.pose.orientation.z = 0
-				target.target_pose.pose.orientation.w = 1
-				returngoal = self.getbasereturn(target, 1)
-			elif int(args[0]) == 2:
-				rospy.loginfo('Going to room 2')
-				target.target_pose.pose.position.x = 0
-				target.target_pose.pose.position.y = 0
-				target.target_pose.pose.orientation.z = 0
-				target.target_pose.pose.orientation.w = 1
-				returngoal = self.getbasereturn(target, 2)
-			elif int(args[0]) == 3:
-				rospy.loginfo('Going to room 3')
-				target.target_pose.pose.position.x = 0
-				target.target_pose.pose.position.y = 0
-				target.target_pose.pose.orientation.z = 0.7071
-				target.target_pose.pose.orientation.w = 0.7071
-				returngoal = self.getbasereturn(target, 3)
-		
-			self.sendGoal(target, returngoal)
 			rospy.loginfo('Goal met and returned to base')
 
 
 if __name__ == '__main__':
 	try:
 		sndr = Client()
-		sndr.receiveGoal()
+		sndr.receive_goal()
 		rospy.spin()
 	except rospy.ROSInterruptException:
 		rospy.logerr('Program interrupted before completion')
