@@ -20,31 +20,41 @@ class Client:
 		self.position = Point()
 		self.orientation = Quaternion()
 
+
 	def position_callback(self, msg):
 		self.position = msg.pose.pose.position
 		self.orientation = msg.pose.pose.orientation
 		print(self.position)
 
-	def send_goal(self, goal, returngoal):
+
+	def send_goal(self, goal):
 		self.client.send_goal(goal)
 		self.client.wait_for_result()
 
+		returngoal = getbasereturn()
+
 		if self.client.get_result():
 			rospy.loginfo('Goal met')
-			raw_input('Press [ENTER] to return to base')
-			returngoal.target_pose.header.stamp = rospy.Time.now()
-			self.client.send_goal(returngoal)
-			self.client.wait_for_result()
-
-			if self.client.get_result():
-				rospy.loginfo('Succesfully returned to base')
-			else:
-				rospy.logerr('Base not reached')
+			rospy.loginfo('Press [ENTER] to return to base')
+			raw_input()
 		else:
 			rospy.logerr('Goal not reached')
+			rospy.loginfo('Press [ENTER] to return to base')
+			raw_input()
+
+		returngoal.target_pose.header.stamp = rospy.Time.now()
+		self.client.send_goal(returngoal)
+		self.client.wait_for_result()
+
+		if self.client.get_result():
+			rospy.loginfo('Base successfully returned to')
+		else:
+			rospy.logerr('Base not reached. Human interaction required')
+
 
 	def get_goal(self, room):
-		point = ROOMS[room]
+		point = ROOMS[room][:2]
+		rotation = ROOMS[room][2]
 
 		target = MoveBaseGoal()
 		target.target_pose.header.frame_id = 'base_link'
@@ -52,21 +62,21 @@ class Client:
 		target.target_pose.pose.position.x, target.target_pose.pose.position.y = helpers.pointstovector((self.position.x,
 																					self.position.y), point)
 
-		if ROOMS[room] == 'F'
+		if rotation == 'F'
 			target.target_pose.pose.orientation.z = 0
 			target.target_pose.pose.orientation.w = 1
-		elif ROOMS[room] == 'R':
+		elif rotation == 'R':
 			target.target_pose.pose.orientation.z = 0.7071
 			target.target_pose.pose.orientation.w = 0.7071
-		elif ROOMS[room] == 'B':
+		elif rotation == 'B':
 			target.target_pose.pose.orientation.z = 1
 			target.target_pose.pose.orientation.w = 0
-		elif ROOMS[room] == 'L':
+		elif rotation == 'L':
 			target.target_pose.pose.orientation.z = -0.7071
 			target.target_pose.pose.orientation.w = 0.7071
-
 		return target
 	
+
 	def getbasereturn(self):
 		turn = MoveBaseGoal()
 		turn.target_pose.header.frame_id = 'base_link'
@@ -80,10 +90,10 @@ class Client:
 
 		returngoal = MoveBaseGoal()
 		returngoal.target_pose.header.frame_id = 'base_link'
-		returngoal.target_pose.header.stamp = rospy.Time.now()
 		returngoal.target_pose.pose.position.x, returngoal.target_pose.pose.position.y = helpers.pointstovector((self.position.x,
-																		self.position.y), ROOMS['BASE'])
+																		self.position.y), ROOMS['BASE'][:2])
 		return returngoal
+
 
 	def receive_goal(self):
 		localIP = ''
@@ -117,7 +127,7 @@ class Client:
 			self.send_goal(target)
 
 			rospy.loginfo('Goal met and returned to base')
-
+			
 
 if __name__ == '__main__':
 	try:
