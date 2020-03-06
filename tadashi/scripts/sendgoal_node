@@ -35,13 +35,11 @@ class Client:
 
 		if self.client.get_result():
 			rospy.loginfo('Goal met')
-			rospy.loginfo('Press [ENTER] to return to base')
-			raw_input()
 		else:
 			rospy.logerr('Goal not reached')
-			rospy.loginfo('Press [ENTER] to return to base')
-			raw_input()
-
+		
+		rospy.loginfo('Press [ENTER] to return to base')
+		raw_input()
 		returngoal.target_pose.header.stamp = rospy.Time.now()
 		self.client.send_goal(returngoal)
 		self.client.wait_for_result()
