@@ -10,7 +10,7 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseWithCovariance, Twist, Pose, Point, Quaternion
 
-class Client:
+class GoalClient:
 	def __init__(self):
 		rospy.init_node('send_goal', anonymous=True)
 		self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
@@ -140,7 +140,7 @@ class Client:
 
 if __name__ == '__main__':
 	try:
-		sndr = Client()
+		sndr = GoalClient()
 		sndr.receive_goal()
 		rospy.spin()
 	except rospy.ROSInterruptException:
