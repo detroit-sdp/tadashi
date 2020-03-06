@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
 ROOMS = {
-	1: (),
-	2: (),
-	3: ()
+	1: (x,y, 'F'),
+	2: (x,y, 'F'),
+	3: (x,y, 'L')
+	'BASE': (0.0, 0.0, 'F')
 }
+
+COMMANDS = {'GOTO', 'LIFT'}
