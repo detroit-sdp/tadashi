@@ -11,6 +11,7 @@ bufferSize = 1024
 
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 UDPServerSocket.bind((localIP, localPort))
+UDPServerSocket.settimeout(None)
 
 print('UDP server up and listening')
 
@@ -21,3 +22,6 @@ while(True):
 
 	print('Message from Client:{}'.format(message))
 	print('Client IP Address:{}'.format(address))
+
+	sendaddress = ('192.168.105.95', 20001)
+	UDPServerSocket.sendto(str.encode(message), sendaddress)
