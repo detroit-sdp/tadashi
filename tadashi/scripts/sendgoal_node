@@ -10,120 +10,114 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseWithCovariance, Twist, Pose
 
 class Client:
-    def __init__(self):
-        rospy.init_node('send_goal', anonymous=True)
-        self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-        self.client.wait_for_server()
+	def __init__(self):
+		rospy.init_node('send_goal', anonymous=True)
+		self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+		self.client.wait_for_server()
 
-    def sendGoal(self, goal, returngoal):
-        self.client.send_goal(goal)
-        self.client.wait_for_result()
+	def sendGoal(self, goal, returngoal):
+		self.client.send_goal(goal)
+		self.client.wait_for_result()
 
-        if self.client.get_result():
-            rospy.loginfo('Goal met')
-            raw_input('Press [ENTER] to return to base')
-            returngoal.target_pose.header.stamp = rospy.Time.now()
-            self.client.send_goal(returngoal)
-            self.client.wait_for_result()
+		if self.client.get_result():
+			rospy.loginfo('Goal met')
+			raw_input('Press [ENTER] to return to base')
+			returngoal.target_pose.header.stamp = rospy.Time.now()
+			self.client.send_goal(returngoal)
+			self.client.wait_for_result()
 
-            if self.client.get_result():
-                rospy.loginfo('Succesfully returned to base')
-            else:
-                rospy.logerr('Base not reached')
-        else:
-            rospy.logerr('Goal not reached')
-    
-    def getbasereturn(self, goal, room):
-        returngoal = MoveBaseGoal()
-        returngoal.target_pose.header.frame_id = 'base_link'
-        returngoal.target_pose.header.stamp = rospy.Time.now()
+			if self.client.get_result():
+				rospy.loginfo('Succesfully returned to base')
+			else:
+				rospy.logerr('Base not reached')
+		else:
+			rospy.logerr('Goal not reached')
+	
+	def getbasereturn(self, goal, room):
+		returngoal = MoveBaseGoal()
+		returngoal.target_pose.header.frame_id = 'base_link'
+		returngoal.target_pose.header.stamp = rospy.Time.now()
 
-        if room == 1:
-            returngoal.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.x)
-            returngoal.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.y)
-            returngoal.target_pose.pose.orientation.z = 0.0
-            returngoal.target_pose.pose.orientation.w = 1.0
-        elif room == 2:
-            returngoal.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.x)
-            returngoal.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.y)
-            returngoal.target_pose.pose.orientation.z = 0.0
-            returngoal.target_pose.pose.orientation.w = 1.0
-        elif room == 3:
-            returngoal.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.y)
-            returngoal.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.x)
-            returngoal.target_pose.pose.orientation.z = -0.7071
-            returngoal.target_pose.pose.orientation.w = 0.7071
-        
-        return returngoal
+		if room == 1:
+			returngoal.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.x)
+			returngoal.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.y)
+			returngoal.target_pose.pose.orientation.z = 0.0
+			returngoal.target_pose.pose.orientation.w = 1.0
+		elif room == 2:
+			returngoal.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.x)
+			returngoal.target_pose.pose.position.y = -1.0 * (goal.target_pose.pose.position.y)
+			returngoal.target_pose.pose.orientation.z = 0.0
+			returngoal.target_pose.pose.orientation.w = 1.0
+		elif room == 3:
+			returngoal.target_pose.pose.position.x = -1.0 * (goal.target_pose.pose.position.y)
+			returngoal.target_pose.pose.position.y = goal.target_pose.pose.position.x
+			returngoal.target_pose.pose.orientation.z = -0.7071
+			returngoal.target_pose.pose.orientation.w = 0.7071
+		
+		return returngoal
 
-    def receiveGoal(self):
-        localIP = ''
+	def receiveGoal(self):
+		localIP = ''
 
-        localPort = 20001
-        bufferSize = 1024
+		localPort = 20001
+		bufferSize = 1024
 
-        # msgFromServer = "Message received"
-        # bytesToSend = str.encode(msgFromServer)
+		UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+		UDPServerSocket.bind((localIP, localPort))
+		UDPServerSocket.settimeout(None)
 
-        UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        UDPServerSocket.bind((localIP, localPort))
-        UDPServerSocket.settimeout(None)
+		print('UDP server up and listening')
 
-        print('UDP server up and listening')
+		while(True):
+			bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
 
-        while(True):
-            bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
+			commands = helpers.splitstringbychar(bytesAddressPair[0], ' ')
+			address = bytesAddressPair[1]
 
-            commands = helpers.splitstringbychar(bytesAddressPair[0], ' ')
-            address = bytesAddressPair[1]
+			rospy.loginfo('Message from Client:{}'.format(bytesAddressPair[0]))
+			rospy.loginfo('Client IP Address:{}'.format(address))
 
-            rospy.loginfo('Message from Client:{}'.format(bytesAddressPair[0]))
-            rospy.loginfo('Client IP Address:{}'.format(address))
+			command = commands[0]
+			args = commands[1:]
 
-            command = commands[0]
-            args = commands[1:]
+			if command.upper() != 'GOTO' or int(args[0]) > 3:
+				rospy.logerr('Command not recognised')
+				continue
 
-            if command.upper() != 'GOTO' or int(args[0]) > 3:
-                rospy.logerr('Command not recognised')
-                continue
+			target = MoveBaseGoal()
+			target.target_pose.header.frame_id = 'base_link'
+			target.target_pose.header.stamp = rospy.Time.now()
 
-            target = MoveBaseGoal()
-            target.target_pose.header.frame_id = 'base_link'
-            target.target_pose.header.stamp = rospy.Time.now()
-
-            if int(args[0]) == 1:
-                rospy.loginfo('Going to room 1')
-                target.target_pose.pose.position.x = 0
-                target.target_pose.pose.position.y = 0
-                target.target_pose.pose.orientation.z = 0
-                target.target_pose.pose.orientation.w = 1
-                returngoal = self.getbasereturn(target, 1)
-            elif int(args[0]) == 2:
-                rospy.loginfo('Going to room 2')
-                target.target_pose.pose.position.x = 0
-                target.target_pose.pose.position.y = 0
-                target.target_pose.pose.orientation.z = 0
-                target.target_pose.pose.orientation.w = 1
-                returngoal = self.getbasereturn(target, 2)
-            elif int(args[0]) == 3:
-                rospy.loginfo('Going to room 3')
-                target.target_pose.pose.position.x = 0
-                target.target_pose.pose.position.y = 0
-                target.target_pose.pose.orientation.z = 0.7071
-                target.target_pose.pose.orientation.w = 0.7071
-                returngoal = self.getbasereturn(target, 3)
-        
-            self.sendGoal(target, returngoal)
-            rospy.loginfo('Goal met and returned to base')
-
-            # # address = (address[0], 20002)
-            # UDPServerSocket.sendto(bytesToSend, address)
+			if int(args[0]) == 1:
+				rospy.loginfo('Going to room 1')
+				target.target_pose.pose.position.x = 0
+				target.target_pose.pose.position.y = 0
+				target.target_pose.pose.orientation.z = 0
+				target.target_pose.pose.orientation.w = 1
+				returngoal = self.getbasereturn(target, 1)
+			elif int(args[0]) == 2:
+				rospy.loginfo('Going to room 2')
+				target.target_pose.pose.position.x = 0
+				target.target_pose.pose.position.y = 0
+				target.target_pose.pose.orientation.z = 0
+				target.target_pose.pose.orientation.w = 1
+				returngoal = self.getbasereturn(target, 2)
+			elif int(args[0]) == 3:
+				rospy.loginfo('Going to room 3')
+				target.target_pose.pose.position.x = 0
+				target.target_pose.pose.position.y = 0
+				target.target_pose.pose.orientation.z = 0.7071
+				target.target_pose.pose.orientation.w = 0.7071
+				returngoal = self.getbasereturn(target, 3)
+		
+			self.sendGoal(target, returngoal)
+			rospy.loginfo('Goal met and returned to base')
 
 
 if __name__ == '__main__':
-    try:
-        sndr = Client()
-        sndr.receiveGoal()
-        rospy.spin()
-    except rospy.ROSInterruptException:
-        rospy.logerr('Program interrupted before completion')
+	try:
+		sndr = Client()
+		sndr.receiveGoal()
+		rospy.spin()
+	except rospy.ROSInterruptException:
+		rospy.logerr('Program interrupted before completion')
