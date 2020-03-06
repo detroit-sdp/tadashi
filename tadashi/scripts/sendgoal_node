@@ -8,7 +8,7 @@ from tadashi_helpers import *
 from const import *
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PoseWithCovariance, Twist, Pose, Point, Quaternion
+from geometry_msgs.msg import Point, Quaternion
 
 class GoalClient:
 	def __init__(self):
