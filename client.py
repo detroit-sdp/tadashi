@@ -1,6 +1,6 @@
 import socket
 
-serverAddressPort = ('192.168.105.172', 20001)
+serverAddressPort = ('localhost', 20001)
 bufferSize = 1024
 
 UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
