@@ -9,6 +9,7 @@ from const import *
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point, Quaternion
+from math import sqrt
 
 class GoalClient:
 	def __init__(self):
@@ -18,7 +19,7 @@ class GoalClient:
 
 		self.positiontracker = rospy.Subscriber('odom', Odometry, self.position_callback)
 		self.position = Point()
-		self.orientation = Quaternion()
+		# self.orientation = Quaternion()
 
 
 	def position_callback(self, msg):
@@ -31,15 +32,15 @@ class GoalClient:
 		self.client.send_goal(goal)
 		self.client.wait_for_result()
 
-		returngoal = getbasereturn()
-
 		if self.client.get_result():
 			rospy.loginfo('Goal met')
 		else:
 			rospy.logerr('Goal not reached')
+			self.facefront()
 
 		rospy.loginfo('Press [ENTER] to return to base')
 		raw_input()
+		returngoal = self.getbasereturn(self.client.get_result())
 		returngoal.target_pose.header.stamp = rospy.Time.now()
 		self.client.send_goal(returngoal)
 		self.client.wait_for_result()
@@ -59,27 +60,66 @@ class GoalClient:
 		target.target_pose.pose.position.x, target.target_pose.pose.position.y = pointstovector((self.position.x,
 																						self.position.y), point)
 
-		if rotation == 'F'
+		if rotation == 'F':
 			target.target_pose.pose.orientation.z = 0
 			target.target_pose.pose.orientation.w = 1
 		elif rotation == 'R':
-			target.target_pose.pose.orientation.z = 0.7071
+			target.target_pose.pose.orientation.z = -0.7071
 			target.target_pose.pose.orientation.w = 0.7071
 		elif rotation == 'B':
 			target.target_pose.pose.orientation.z = 1
 			target.target_pose.pose.orientation.w = 0
 		elif rotation == 'L':
-			target.target_pose.pose.orientation.z = -0.7071
+			target.target_pose.pose.orientation.z = 0.7071
 			target.target_pose.pose.orientation.w = 0.7071
 
 		return target
 	
 
-	def getbasereturn(self):
+	def getbasereturn(self, inroom):
+		returngoal = MoveBaseGoal()
+		returngoal.target_pose.header.frame_id = 'base_link'
+		returngoal.target_pose.pose.position.x, returngoal.target_pose.pose.position.y = pointstovector((self.position.x,
+																		self.position.y), ROOMS['BASE'][0])
+		returngoal.target_pose.pose.orientation.z = 0
+		returngoal.target_pose.pose.orientation.w = 1
 
-		save = Quaternion()
-		save = self.orientation
+		if inroom:
+			rotation = self.roomrotation()
 
+			if rotation == 'B':
+				returngoal.target_pose.pose.position.x = -1 * (returngoal.target_pose.pose.position.x)
+				returngoal.target_pose.pose.position.y = -1 * (returngoal.target_pose.pose.position.y)
+				returngoal.target_pose.pose.orientation.z = 1
+				returngoal.target_pose.pose.orientation.w = 0
+			elif rotation == 'L':
+				returngoal.target_pose.pose.position.x = returngoal.target_pose.pose.position.y
+				returngoal.target_pose.pose.position.y = returngoal.target_pose.pose.position.x
+				returngoal.target_pose.pose.orientation.z = -0.7071
+				returngoal.target_pose.pose.orientation.w = 0.7071
+			elif rotation == 'R':
+				returngoal.target_pose.pose.position.x = -1 * returngoal.target_pose.pose.position.y
+				returngoal.target_pose.pose.position.y = -1 * returngoal.target_pose.pose.position.x
+				returngoal.target_pose.pose.orientation.z = 0.7071
+				returngoal.target_pose.pose.orientation.w = 0.7071
+		
+		return returngoal
+	
+
+	def roomrotation(self):
+		return ROOMS[self.findnearest()][1]
+
+
+	def findnearest(self):
+		nearest = 'BASE'
+
+		for room in ROOMS:
+			if (sqrt((self.position.x - ROOMS[room][0][0]) ** 2 + (self.position.y - ROOMS[room][0][1]) ** 2)) < (sqrt((self.position.x - ROOMS[nearest][0][0]) ** 2 + (self.position.y - ROOMS[nearest][0][1]) ** 2)):
+				nearest = room
+		return nearest
+
+
+	def facefront(self):
 		turn = MoveBaseGoal()
 		turn.target_pose.header.frame_id = 'base_link'
 		turn.target_pose.header.stamp = rospy.Time.now()
@@ -89,19 +129,6 @@ class GoalClient:
 		turn.target_pose.pose.orientation.w = 1
 		self.client.send_goal(turn)
 		self.client.wait_for_result()
-
-		returngoal = MoveBaseGoal()
-		returngoal.target_pose.header.frame_id = 'base_link'
-		returngoal.target_pose.pose.position.x, returngoal.target_pose.pose.position.y = pointstovector((self.position.x,
-																		self.position.y), ROOMS['BASE'][0])
-
-		turn.target_pose.header.stamp = rospy.Time.now()
-		turn.target_pose.pose.orientation.z = save.z
-		turn.target_pose.pose.orientation.w = save.w
-		self.client.send_goal(turn)
-		self.client.wait_for_result()
-
-		return returngoal
 
 
 	def receive_goal(self):
@@ -133,7 +160,7 @@ class GoalClient:
 				continue
 
 			if command.upper() == 'GOTO':
-				target = get_goal(int(args[0]))
+				target = self.get_goal(int(args[0]))
 				self.send_goal(target)
 				
 
