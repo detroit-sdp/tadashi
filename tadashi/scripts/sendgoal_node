@@ -24,14 +24,12 @@ class GoalClient:
 		self.batterychecker = rospy.Subscriber('battery_state', BatteryState, self.battery_callback)
 		self.battery_charge = 0
 
-		self.status = STATUS[self.get_state()]
 		self.state = 0
 
 		localIP = ''
 		localPort = 20001
-		bufferSize = 1024
 
-		self.tbotaddress = ('192.168.105.172', 20001)
+		self.tbotaddress = ('localhost', 20002)
 		self.UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 		self.UDPServerSocket.bind((localIP, localPort))
 		self.UDPServerSocket.settimeout(None)
@@ -66,7 +64,7 @@ class GoalClient:
 
 		rospy.loginfo('Press [ENTER] to return to base')
 		raw_input()
-		returngoal = self.getbasereturn(self.client.get_result())
+		returngoal = self.getbasereturn()
 		returngoal.target_pose.header.stamp = rospy.Time.now()
 		self.client.send_goal(returngoal)
 		self.client.wait_for_result()
@@ -80,7 +78,7 @@ class GoalClient:
 	def change_state(self, state):
 		self.state = state
 		message = STATUS[self.state]
-		UDPServerSocket.sendto(str.encode(message), sendaddress)
+		self.UDPServerSocket.sendto(str.encode(message), self.tbotaddress)
 
 
 	def get_goal(self, room):
@@ -130,8 +128,8 @@ class GoalClient:
 			returngoal.target_pose.pose.orientation.z = -0.7071
 			returngoal.target_pose.pose.orientation.w = 0.7071
 		elif rotation == 'R':
-			returngoal.target_pose.pose.position.x = -1 * returngoal.target_pose.pose.position.y
-			returngoal.target_pose.pose.position.y = -1 * returngoal.target_pose.pose.position.x
+			returngoal.target_pose.pose.position.x = -1.0 * returngoal.target_pose.pose.position.y
+			returngoal.target_pose.pose.position.y = returngoal.target_pose.pose.position.x
 			returngoal.target_pose.pose.orientation.z = 0.7071
 			returngoal.target_pose.pose.orientation.w = 0.7071
 		
@@ -152,8 +150,10 @@ class GoalClient:
 
 
 	def receive_goal(self):
+		bufferSize = 1024
+
 		while(True):
-			bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
+			bytesAddressPair = self.UDPServerSocket.recvfrom(bufferSize)
 
 			commands = splitstringbychar(bytesAddressPair[0], ' ')
 			address = bytesAddressPair[1]
