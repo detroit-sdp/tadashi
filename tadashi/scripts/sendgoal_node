@@ -23,8 +23,7 @@ class GoalClient:
 
 		self.batterychecker = rospy.Subscriber('battery_state', BatteryState, self.battery_callback)
 		self.battery_charge = 0
-
-		self.state = 0
+		self.change_state(0)
 
 		localIP = ''
 		localPort = 20001
@@ -76,9 +75,8 @@ class GoalClient:
 
 
 	def change_state(self, state):
-		self.state = state
-		message = STATUS[self.state]
-		self.UDPServerSocket.sendto(str.encode(message), self.tbotaddress)
+		status = STATUS[self.state]
+		self.UDPServerSocket.sendto(str.encode('STATUS ' + status), self.tbotaddress)
 
 
 	def get_goal(self, room):
