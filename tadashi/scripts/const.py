@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
 ROOMS = {
-	1: ((0.0,0.0), 'R'),
-	2: ((0.0,0.0), 'L'),
-	'BASE': ((0.0,0.0), 'F')
+	1: ((1.98,0.42), 'L'),
+	2: ((2,1.75), 'R'),
+	'BASE': ((0.0, 0.0), 'F')
 }
-
-COMMANDS = {'GOTO', 'STATUS'}
+COMMANDS = {'GOTO', 'LIFT'}
 
 STATUS = {
 	-2: 'LOW_BATTERY',
