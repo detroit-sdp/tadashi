@@ -75,7 +75,7 @@ class GoalClient:
 		return target
 	
 
-	def getbasereturn(self, inroom):
+	def getbasereturn(self):
 		returngoal = MoveBaseGoal()
 		returngoal.target_pose.header.frame_id = 'base_link'
 		returngoal.target_pose.pose.position.x, returngoal.target_pose.pose.position.y = pointstovector((self.position.x,
@@ -83,24 +83,24 @@ class GoalClient:
 		returngoal.target_pose.pose.orientation.z = 0
 		returngoal.target_pose.pose.orientation.w = 1
 
-		if inroom:
-			rotation = self.roomrotation()
-
-			if rotation == 'B':
-				returngoal.target_pose.pose.position.x = -1 * (returngoal.target_pose.pose.position.x)
-				returngoal.target_pose.pose.position.y = -1 * (returngoal.target_pose.pose.position.y)
-				returngoal.target_pose.pose.orientation.z = 1
-				returngoal.target_pose.pose.orientation.w = 0
-			elif rotation == 'L':
-				returngoal.target_pose.pose.position.x = returngoal.target_pose.pose.position.y
-				returngoal.target_pose.pose.position.y = returngoal.target_pose.pose.position.x
-				returngoal.target_pose.pose.orientation.z = -0.7071
-				returngoal.target_pose.pose.orientation.w = 0.7071
-			elif rotation == 'R':
-				returngoal.target_pose.pose.position.x = -1 * returngoal.target_pose.pose.position.y
-				returngoal.target_pose.pose.position.y = -1 * returngoal.target_pose.pose.position.x
-				returngoal.target_pose.pose.orientation.z = 0.7071
-				returngoal.target_pose.pose.orientation.w = 0.7071
+		
+		rotation = self.roomrotation()
+		
+		if rotation == 'B':
+			returngoal.target_pose.pose.position.x = -1 * (returngoal.target_pose.pose.position.x)
+			returngoal.target_pose.pose.position.y = -1 * (returngoal.target_pose.pose.position.y)
+			returngoal.target_pose.pose.orientation.z = 1
+			returngoal.target_pose.pose.orientation.w = 0
+		elif rotation == 'L':
+			returngoal.target_pose.pose.position.x = returngoal.target_pose.pose.position.y
+			returngoal.target_pose.pose.position.y = returngoal.target_pose.pose.position.x
+			returngoal.target_pose.pose.orientation.z = -0.7071
+			returngoal.target_pose.pose.orientation.w = 0.7071
+		elif rotation == 'R':
+			returngoal.target_pose.pose.position.x = -1 * returngoal.target_pose.pose.position.y
+			returngoal.target_pose.pose.position.y = -1 * returngoal.target_pose.pose.position.x
+			returngoal.target_pose.pose.orientation.z = 0.7071
+			returngoal.target_pose.pose.orientation.w = 0.7071
 		
 		return returngoal
 	
