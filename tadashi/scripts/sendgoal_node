@@ -23,7 +23,6 @@ class GoalClient:
 
 	def position_callback(self, msg):
 		self.position = msg.pose.pose.position
-		self.orientation = msg.pose.pose.orientation
 
 
 	def send_goal(self, goal):
