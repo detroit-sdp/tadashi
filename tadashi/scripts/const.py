@@ -6,7 +6,7 @@ ROOMS = {
 	'BASE': ((0.0,0.0), 'F')
 }
 
-COMMANDS = {'GOTO', 'LIFT'}
+COMMANDS = {'GOTO', 'STATUS'}
 
 STATUS = {
 	-2: 'LOW_BATTERY',
