@@ -9,3 +9,11 @@ ROOMS = {
 }
 
 COMMANDS = {'GOTO', 'LIFT'}
+
+STATUS = {
+	-2: 'LOW_BATTERY',
+	-1: 'ASSISTANCE',
+	 0: 'BASE',
+	 1: 'MOVING',
+	 2: 'ARRIVED'
+}
