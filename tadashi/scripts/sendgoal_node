@@ -9,6 +9,7 @@ from const import *
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point, Quaternion
+from sensor_msgs.msg import BatteryState
 from math import sqrt
 
 class GoalClient:
@@ -20,21 +21,48 @@ class GoalClient:
 		self.positiontracker = rospy.Subscriber('odom', Odometry, self.position_callback)
 		self.position = Point()
 
+		self.batterychecker = rospy.Subscriber('battery_state', BatteryState, self.battery_callback)
+		self.battery_charge = 0
+
+		self.status = STATUS[self.get_state()]
+		self.state = 0
+
+		localIP = ''
+		localPort = 20001
+		bufferSize = 1024
+
+		self.tbotaddress = ('192.168.105.172', 20001)
+		self.UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+		self.UDPServerSocket.bind((localIP, localPort))
+		self.UDPServerSocket.settimeout(None)
+
+
+	def battery_callback(self, msg):
+		self.battery_charge = msg.percentage
+
+		if self.battery_charge < 0.15:
+			self.change_state(-2)
+
 
 	def position_callback(self, msg):
 		self.position = msg.pose.pose.position
 
 
 	def send_goal(self, goal):
+		if self.state == -2:
+			return None
+
 		goal.target_pose.header.stamp = rospy.Time.now()
+		self.change_state(1)
 		self.client.send_goal(goal)
 		self.client.wait_for_result()
 
 		if self.client.get_result():
 			rospy.loginfo('Goal met')
+			self.change_state(2)
 		else:
 			rospy.logerr('Goal not reached')
-			self.facefront()
+			self.change_state(-1)
 
 		rospy.loginfo('Press [ENTER] to return to base')
 		raw_input()
@@ -47,6 +75,12 @@ class GoalClient:
 			rospy.loginfo('Base successfully returned to')
 		else:
 			rospy.logerr('Base not reached: ASSISTANCE REQUIRED')
+
+
+	def change_state(self, state):
+		self.state = state
+		message = STATUS[self.state]
+		UDPServerSocket.sendto(str.encode(message), sendaddress)
 
 
 	def get_goal(self, room):
@@ -117,30 +151,7 @@ class GoalClient:
 		return nearest
 
 
-	def facefront(self):
-		turn = MoveBaseGoal()
-		turn.target_pose.header.frame_id = 'base_link'
-		turn.target_pose.header.stamp = rospy.Time.now()
-		turn.target_pose.pose.position.x = 0
-		turn.target_pose.pose.position.y = 0
-		turn.target_pose.pose.orientation.z = 0
-		turn.target_pose.pose.orientation.w = 1
-		self.client.send_goal(turn)
-		self.client.wait_for_result()
-
-
 	def receive_goal(self):
-		localIP = ''
-
-		localPort = 20001
-		bufferSize = 1024
-
-		UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-		UDPServerSocket.bind((localIP, localPort))
-		UDPServerSocket.settimeout(None)
-
-		print('UDP server up and listening')
-
 		while(True):
 			bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
 
