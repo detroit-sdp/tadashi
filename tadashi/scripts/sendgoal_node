@@ -19,7 +19,6 @@ class GoalClient:
 
 		self.positiontracker = rospy.Subscriber('odom', Odometry, self.position_callback)
 		self.position = Point()
-		# self.orientation = Quaternion()
 
 
 	def position_callback(self, msg):
