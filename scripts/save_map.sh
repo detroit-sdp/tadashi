@@ -1,1 +1,1 @@
-mkdir savedmaps && rosrun map_server map_saver -f ~/savedmaps
+mkdir savedmaps && rosrun map_server map_saver -f ~/saved_maps
