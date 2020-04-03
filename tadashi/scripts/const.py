@@ -1,10 +1,13 @@
 #!/usr/bin/env python
+import json
 
-ROOMS = {
-	1: ((1.98,0.42), 'L'),
-	2: ((2,1.75), 'R'),
-	'BASE': ((0.0, 0.0), 'F')
-}
+with open('rooms.json') as f:
+    ROOMS = json.load(f)
+for x in ROOMS:
+    ROOMS[x][0] = tuple(ROOMS[x][0])
+    ROOMS[x] = tuple(ROOMS[x])
+ROOMS['BASE'] = ((0.0,0.0),'F')
+
 COMMANDS = {'GOTO', 'LIFT'}
 
 STATUS = {
