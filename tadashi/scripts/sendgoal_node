@@ -167,7 +167,7 @@ class GoalClient:
 				continue
 
 			if command.upper() == 'GOTO':
-				target = self.get_goal(int(args[0]))
+				target = self.get_goal(args[0])
 				self.send_goal(target)
 				
 
